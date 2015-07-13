@@ -37,15 +37,21 @@ del df['velocity']
 print "Locating"
 g = locationgrid.GridLocator()
 
-g(df["latitude"],df["longitude"])
+#Load the grid - this can be done piecewise, but f it, let's do it all at once
+#g(df["latitude"],df["longitude"])
 
 
-nz = g.nonzero()
+print "Generating image..."
+from locimage import LocationImageMaker
 
-with open("coormap.txt","w") as f:
-    for i in xrange(len(nz[0])):
-        v = g.coorToGPS(nz[0][i],nz[1][i])
-        f.write(str(v[0])+","+str(v[1])+"\n")
-
-
-
+l = LocationImageMaker()
+for i in reversed(xrange(400000)):
+    g([df["latitude"][i],],[df["longitude"][i],])
+    n = g.getNode(df["latitude"][i],df["longitude"][i])
+    if n>=0:
+        l(df["timestamp"][i],n)
+print "Done generating"
+def sigm(s):
+    return 1/(1+exp(-s))
+plot(sigm(l.currentvector[:l.currentnodes]))
+show()

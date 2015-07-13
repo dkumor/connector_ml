@@ -13,7 +13,8 @@ class GridLocator(object):
         self.numexists = numexist
         self.randgen = randgen
         self.numgrid = scipy.sparse.lil_matrix((self.latsize,self.longsize),dtype=int)
-        self.grid = scipy.sparse.lil_matrix((self.latsize,self.longsize),dtype=bool)
+        self.grid = scipy.sparse.lil_matrix((self.latsize,self.longsize),dtype=int)
+        self.curint = 1
     def getGridCoordinate(self,lat,long):
         newlat = int(self.latsize * (lat + 90.)/180.)
         newlong = int(self.longsize * (long + 180)/360.)
@@ -30,7 +31,12 @@ class GridLocator(object):
             lat,long = self.getGridCoordinate(lat_array[i],long_array[i])
             self.numgrid[lat,long]+=1
             if self.numgrid[lat,long]==self.numexists:
-                self.grid[lat,long] = True
+                self.grid[lat,long] = self.curint
+                self.curint +=1
+
+    def getNode(self,lat,long):
+        x,y = self.getGridCoordinate(lat,long)
+        return self.grid[x,y]-1
 
 
 if __name__=="__main__":
